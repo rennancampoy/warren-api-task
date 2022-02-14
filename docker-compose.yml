@@ -16,7 +16,7 @@ services:
     links:
       - db
     ports:
-      - '9000:9000'
+      - '3000:3000'
 
   db:
     image: 'mongo'
