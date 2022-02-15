@@ -1,3 +1,4 @@
+import { TransactionsModule } from './transactions/transactions.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -20,6 +21,7 @@ import validationSchema from './config/validation/env.schema';
       }),
       inject: [ConfigService],
     }),
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
