@@ -10,6 +10,10 @@ services:
       - ./node_modules:/node-app/node_modules
     environment:
       NODE_ENV: development
+      API_TITLE: Warren API
+      API_DESCRIPTION: API de teste da Warren. 
+      API_VERSION: 1.0
+      API_PORT: 3000
       DATABASE_URI: mongodb://db:27017/node-mongo-docker
     depends_on:
       - db
