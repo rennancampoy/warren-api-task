@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as config from './config';
 import validationSchema from './config/validation/env.schema';
 import { PortfoliosModule } from './portfolios/portfolios.module';
+import { TransactionsModule } from './transactions/transactions.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +19,7 @@ import { PortfoliosModule } from './portfolios/portfolios.module';
       }),
       inject: [ConfigService],
     }),
+    TransactionsModule,
     PortfoliosModule,
   ],
 })
