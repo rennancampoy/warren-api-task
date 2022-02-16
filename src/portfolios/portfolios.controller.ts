@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { CustomerId } from './../decorators/customer-id.decorator';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
@@ -12,6 +13,20 @@ import { PortfoliosService } from './portfolios.service';
 export class PortfoliosController {
   constructor(private portfoliosService: PortfoliosService) {}
 
+  @ApiOperation({
+    summary:
+      'Returns a list of portfolios where the amount is greater than the goal',
+  })
+  @ApiOkResponse({
+    description: 'Response with success',
+    type: '', //TODO: create DTO
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @Get('goalReached')
+  goalReached(@CustomerId() customerId) {
+    return this.portfoliosService.goalReached(customerId);
+  }
+
   @ApiOperation({ summary: 'Returns the portfolio details from a given id' })
   @ApiOkResponse({
     description: 'Response with success',
@@ -19,7 +34,7 @@ export class PortfoliosController {
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Get(':id')
-  getPortfolioDetails(@Param('id') id: string) {
-    return this.portfoliosService.getDetails(id);
+  getDetails(@CustomerId() customerId, @Param('id') portfolioId: string) {
+    return this.portfoliosService.getDetails(customerId, portfolioId);
   }
 }
