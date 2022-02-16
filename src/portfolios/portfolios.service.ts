@@ -10,11 +10,14 @@ export class PortfoliosService {
     private readonly customerModel: Model<CustomerDocument>,
   ) {}
 
-  getDetails = async (customerId: string, portfolioId: string) => {
-    const portfolios = (
-      await this.customerModel.findOne(new Types.ObjectId(customerId))
-    ).portfolios;
+  portfoliosFromCustomer = async (customerId: string) =>
+    (await this.customerModel.findById(customerId)).portfolios;
 
-    return portfolios.id(portfolioId);
-  };
+  getDetails = async (customerId: string, portfolioId: string) =>
+    (await this.portfoliosFromCustomer(customerId)).id(portfolioId);
+
+  goalReached = async (customerId: string) =>
+    (await this.portfoliosFromCustomer(customerId)).filter(
+      (p) => p.amount >= p.goalAmount,
+    );
 }
