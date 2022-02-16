@@ -1,3 +1,4 @@
+import { PortfoliosService } from './../portfolios/portfolios.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -11,7 +12,10 @@ import { TransactionsService } from './transactions.service';
 @ApiTags('Transactions')
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private transactionsService: TransactionsService) {}
+  constructor(
+    private transactionsService: TransactionsService,
+    private portfolioService: PortfoliosService,
+  ) {}
 
   @ApiOperation({
     summary:
@@ -67,6 +71,42 @@ export class TransactionsController {
     return this.transactionsService.accountTransfer(
       fromCustomerId,
       toCustomerId,
+      amount,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Transfer a value from a portfolio to another',
+  })
+  @ApiOkResponse({
+    description: 'Response with success',
+    type: '', //TODO: create DTO
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @Post('portfolio-transfer')
+  async portfolioTransfer(
+    @CustomerId() customerId,
+    @Query('fromPortfolio') fromPortfolio,
+    @Query('toPortfolio') toPortfolio,
+    @Body('amount') amount,
+  ) {
+    const fromPortfolioDetails = await this.portfolioService.getDetails(
+      customerId,
+      fromPortfolio,
+    );
+
+    if (fromPortfolioDetails.amount - amount < 0)
+      return { error: 'Insufficient portfolio balance' };
+
+    const toPortfolioDetails = await this.portfolioService.getDetails(
+      customerId,
+      toPortfolio,
+    );
+
+    return this.transactionsService.portfolioTransfer(
+      customerId,
+      fromPortfolioDetails,
+      toPortfolioDetails,
       amount,
     );
   }

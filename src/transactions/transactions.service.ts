@@ -1,5 +1,6 @@
+import { Portfolio } from './../models/portfolio.model';
 import { CustomerDocument } from 'src/models/customer.model';
-import { Model, Types } from 'mongoose';
+import { Model, Types, ObjectId } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { fixDate } from './../utils/date';
@@ -51,6 +52,12 @@ export class TransactionsService {
     toCustomerId: string,
     amount: number,
   ) => {
+    if (
+      (await this.customerModel.findById(fromCustomerId)).balance - amount <
+      0
+    )
+      return { error: 'Insufficient account balance' };
+
     await this.customerModel.updateOne(
       { _id: fromCustomerId },
       { $inc: { balance: -amount } },
@@ -73,5 +80,39 @@ export class TransactionsService {
       from: await this.customerModel.findById(fromCustomerId),
       to: await this.customerModel.findById(toCustomerId),
     };
+  };
+
+  portfolioTransfer = async (
+    customerId: string,
+    fromPortfolio: Types.Subdocument<Types.ObjectId> & Portfolio,
+    toPortfolio: Types.Subdocument<Types.ObjectId> & Portfolio,
+    amount: number,
+  ) => {
+    await this.customerModel.updateOne(
+      {
+        _id: new Types.ObjectId(customerId),
+        'portfolios._id': fromPortfolio.id,
+      },
+      { $set: { 'portfolios.$.amount': fromPortfolio.amount - amount } },
+    );
+
+    await this.customerModel.updateOne(
+      {
+        _id: new Types.ObjectId(customerId),
+        'portfolios._id': toPortfolio.id,
+      },
+      { $set: { 'portfolios.$.amount': toPortfolio.amount + amount } },
+    );
+
+    await new this.transactionModel({
+      _customer: new Types.ObjectId(customerId),
+      type: 'portfolio_transfer',
+      fromPortfolio,
+      toPortfolio,
+      status: 'accepted',
+      amount,
+    }).save();
+
+    return await this.customerModel.findById(customerId);
   };
 }
