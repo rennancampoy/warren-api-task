@@ -36,6 +36,21 @@ export class TransactionsService {
       { $inc: { balance: amount } },
     );
 
-    return await this.customerModel.findOne({ _id: customerId });
+    await new this.transactionModel({
+      _customer: new Types.ObjectId(customerId),
+      type: 'deposit',
+      status: 'accepted',
+      amount,
+    }).save();
+
+    console.log(
+      await this.transactionModel.find({
+        _customer: new Types.ObjectId(customerId),
+        type: 'deposit',
+        status: 'accepted',
+      }),
+    );
+
+    return await this.customerModel.findById(customerId);
   };
 }
