@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
@@ -48,5 +48,26 @@ export class TransactionsController {
   @Post('deposit')
   deposit(@CustomerId() customerId, @Body('amount') amount) {
     return this.transactionsService.deposit(customerId, amount);
+  }
+
+  @ApiOperation({
+    summary: 'Transfer a value from the customer to another customer account',
+  })
+  @ApiOkResponse({
+    description: 'Response with success',
+    type: '', //TODO: create DTO
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @Post('account-transfer/:id')
+  accountTransfer(
+    @CustomerId() fromCustomerId,
+    @Param('id') toCustomerId,
+    @Body('amount') amount,
+  ) {
+    return this.transactionsService.accountTransfer(
+      fromCustomerId,
+      toCustomerId,
+      amount,
+    );
   }
 }

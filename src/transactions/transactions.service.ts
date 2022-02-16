@@ -45,4 +45,33 @@ export class TransactionsService {
 
     return await this.customerModel.findById(customerId);
   };
+
+  accountTransfer = async (
+    fromCustomerId: string,
+    toCustomerId: string,
+    amount: number,
+  ) => {
+    await this.customerModel.updateOne(
+      { _id: fromCustomerId },
+      { $inc: { balance: -amount } },
+    );
+
+    await this.customerModel.updateOne(
+      { _id: toCustomerId },
+      { $inc: { balance: amount } },
+    );
+
+    await new this.transactionModel({
+      _customer: new Types.ObjectId(fromCustomerId),
+      toCustomer: new Types.ObjectId(toCustomerId),
+      type: 'account_transfer',
+      status: 'accepted',
+      amount,
+    }).save();
+
+    return {
+      from: await this.customerModel.findById(fromCustomerId),
+      to: await this.customerModel.findById(toCustomerId),
+    };
+  };
 }
