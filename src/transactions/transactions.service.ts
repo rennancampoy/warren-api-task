@@ -43,14 +43,6 @@ export class TransactionsService {
       amount,
     }).save();
 
-    console.log(
-      await this.transactionModel.find({
-        _customer: new Types.ObjectId(customerId),
-        type: 'deposit',
-        status: 'accepted',
-      }),
-    );
-
     return await this.customerModel.findById(customerId);
   };
 }
