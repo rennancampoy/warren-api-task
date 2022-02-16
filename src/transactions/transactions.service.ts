@@ -1,3 +1,4 @@
+import { CustomerDocument } from 'src/models/customer.model';
 import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +10,8 @@ export class TransactionsService {
   constructor(
     @InjectModel('Transaction')
     private readonly transactionModel: Model<TransactionDocument>,
+    @InjectModel('Customer')
+    private readonly customerModel: Model<CustomerDocument>,
   ) {}
 
   deposits = async (
@@ -26,4 +29,13 @@ export class TransactionsService {
         $lt: fixDate(endDate),
       },
     });
+
+  deposit = async (customerId: string, amount: number) => {
+    await this.customerModel.updateOne(
+      { _id: customerId },
+      { $inc: { balance: amount } },
+    );
+
+    return await this.customerModel.findOne({ _id: customerId });
+  };
 }

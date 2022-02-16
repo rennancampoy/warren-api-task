@@ -1,6 +1,8 @@
+import { PortfoliosService } from './../portfolios/portfolios.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { transactionSchema } from 'src/models/transaction.model';
+import { customerSchema } from 'src/models/customer.model';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
 
@@ -11,9 +13,13 @@ import { TransactionsService } from './transactions.service';
         name: 'Transaction',
         schema: transactionSchema,
       },
+      {
+        name: 'Customer',
+        schema: customerSchema,
+      },
     ]),
   ],
-  providers: [TransactionsService],
+  providers: [TransactionsService, PortfoliosService],
   controllers: [TransactionsController],
 })
 export class TransactionsModule {}
