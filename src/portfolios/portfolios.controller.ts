@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { CustomerId } from './../decorators/customer-id.decorator';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
@@ -19,7 +20,10 @@ export class PortfoliosController {
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Get(':id')
-  getPortfolioDetails(@Param('id') id: string) {
-    return this.portfoliosService.getDetails(id);
+  getPortfolioDetails(
+    @CustomerId() customerId,
+    @Param('id') portfolioId: string,
+  ) {
+    return this.portfoliosService.getDetails(customerId, portfolioId);
   }
 }
