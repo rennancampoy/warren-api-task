@@ -1,6 +1,6 @@
-import { customerSchema } from './../models/customer.model';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { customerSchema } from 'src/models/customer.model';
 import { PortfoliosController } from './portfolios.controller';
 import { PortfoliosService } from './portfolios.service';
 
