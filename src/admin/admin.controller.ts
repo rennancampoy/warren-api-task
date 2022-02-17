@@ -4,19 +4,14 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { PortfoliosService } from 'src/portfolios/portfolios.service';
-import { TransactionsService } from 'src/transactions/transactions.service';
 import { AdminService } from './admin.service';
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
-  constructor(
-    private transactionsService: TransactionsService,
-    private portfolioService: PortfoliosService,
-    private adminService: AdminService,
-  ) {}
+  constructor(private adminService: AdminService) {}
 
   @ApiOperation({
     summary:
@@ -27,6 +22,8 @@ export class AdminController {
     type: '', //TODO: create DTO
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'pageSize' })
   @Get('topAllocationAmount')
   topAllocationAmount(@Query('page') page, @Query('pageSize') limit) {
     return this.adminService.topAllocationAmount(page, limit);
@@ -40,6 +37,10 @@ export class AdminController {
     type: '', //TODO: create DTO
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'pageSize' })
+  @ApiQuery({ name: 'start' })
+  @ApiQuery({ name: 'end' })
   @Get('topCashChurn')
   topCashChurn(
     @Query('page') page,

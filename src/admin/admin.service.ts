@@ -2,8 +2,8 @@ import { paginate, paginatedArray } from './../utils/pagination';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { TransactionDocument } from '../models/transaction.model';
-import { CustomerDocument } from 'src/models/customer.model';
+import { TransactionDocument } from '../transactions/transaction.model';
+import { CustomerDocument } from 'src/portfolios/customer.model';
 import { fixDate } from 'src/utils/date';
 
 @Injectable()

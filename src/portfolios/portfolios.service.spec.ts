@@ -1,5 +1,5 @@
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
-import { customerSchema } from '../models/customer.model';
+import { customerSchema } from './customer.model';
 import { PortfoliosService } from './portfolios.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongooseModule } from '@nestjs/mongoose';
