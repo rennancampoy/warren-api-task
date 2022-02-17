@@ -5,6 +5,7 @@ import * as config from './config';
 import validationSchema from './config/validation/env.schema';
 import { PortfoliosModule } from './portfolios/portfolios.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     }),
     TransactionsModule,
     PortfoliosModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
