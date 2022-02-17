@@ -1,3 +1,8 @@
+import {
+  DepositDto,
+  AccountTransferDto,
+  PortfolioTransferDto,
+} from './dto/transactions.dto';
 import { Portfolio } from './../models/portfolio.model';
 import { PortfoliosService } from './../portfolios/portfolios.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
@@ -6,10 +11,12 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CustomerId } from './../decorators/customer-id.decorator';
 import { TransactionsService } from './transactions.service';
 import { Types } from 'mongoose';
+import { CustomerDocument } from 'src/models/customer.model';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -27,6 +34,9 @@ export class TransactionsController {
     description: 'Response with success',
     type: '', //TODO: create DTO
   })
+  @ApiQuery({ name: 'status' })
+  @ApiQuery({ name: 'start' })
+  @ApiQuery({ name: 'end' })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Get('deposits')
   deposits(
@@ -48,11 +58,13 @@ export class TransactionsController {
   })
   @ApiOkResponse({
     description: 'Response with success',
-    type: '', //TODO: create DTO
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Post('deposit')
-  deposit(@CustomerId() customerId, @Body('amount') amount) {
+  deposit(
+    @CustomerId() customerId,
+    @Body() { amount }: DepositDto,
+  ): Promise<CustomerDocument> {
     return this.transactionsService.deposit(customerId, amount);
   }
 
@@ -68,7 +80,7 @@ export class TransactionsController {
   accountTransfer(
     @CustomerId() fromCustomerId,
     @Param('id') toCustomerId,
-    @Body('amount') amount,
+    @Body() { amount }: AccountTransferDto,
   ) {
     return this.transactionsService.accountTransfer(
       fromCustomerId,
@@ -84,13 +96,15 @@ export class TransactionsController {
     description: 'Response with success',
     type: '', //TODO: create DTO
   })
+  @ApiQuery({ name: 'fromPortfolio' })
+  @ApiQuery({ name: 'toPortfolio' })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Post('portfolio-transfer')
   async portfolioTransfer(
     @CustomerId() customerId,
     @Query('fromPortfolio') fromPortfolio,
     @Query('toPortfolio') toPortfolio,
-    @Body('amount') amount,
+    @Body() { amount }: PortfolioTransferDto,
   ) {
     const fromPortfolioDetails:
       | (Types.Subdocument<Types.ObjectId> & Portfolio)
