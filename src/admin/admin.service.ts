@@ -1,9 +1,10 @@
 import { paginate, paginatedArray } from './../utils/pagination';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TransactionDocument } from '../models/transaction.model';
 import { CustomerDocument } from 'src/models/customer.model';
+import { fixDate } from 'src/utils/date';
 
 @Injectable()
 export class AdminService {
@@ -14,7 +15,7 @@ export class AdminService {
     private readonly customerModel: Model<CustomerDocument>,
   ) {}
 
-  topAllocationAmount = async ({ page, limit }) => {
+  topAllocationAmount = async (page: number, limit: number) => {
     const results = this.customerModel.aggregate<CustomerDocument>([
       {
         $addFields: {
@@ -35,19 +36,46 @@ export class AdminService {
     };
   };
 
-  deposit = async (customerId: string, amount: number) => {
-    await this.customerModel.updateOne(
-      { _id: customerId },
-      { $inc: { balance: amount } },
+  topCashChurn = async (
+    page: number,
+    limit: number,
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    const results: any = this.transactionModel.aggregate([
+      {
+        $match: {
+          type: 'withdraw',
+          createdAt: {
+            $gte: fixDate(startDate, true),
+            $lt: fixDate(endDate, true),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$_customer',
+          totalAmount: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    const sorteredCustomers = (await results).sort(
+      (a: any, b: any) => b.totalAmount - a.totalAmount,
     );
 
-    await new this.transactionModel({
-      _customer: new Types.ObjectId(customerId),
-      type: 'deposit',
-      status: 'accepted',
-      amount,
-    }).save();
+    const sorteredWithNames = await Promise.all(
+      sorteredCustomers.map(async (c) => {
+        const { firstName, lastName } = await this.customerModel.findById(
+          c._id,
+        );
+        return { ...c, name: `${firstName} ${lastName}` };
+      }),
+    );
 
-    return await this.customerModel.findById(customerId);
+    return {
+      customers: paginatedArray(sorteredWithNames, page, limit),
+      pagination: paginate(sorteredWithNames.length, page, limit),
+    };
   };
 }

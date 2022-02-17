@@ -20,7 +20,7 @@ export class AdminController {
 
   @ApiOperation({
     summary:
-      'Returns a list of customers with highest allocated amount on they portfolio',
+      'Returns a list of customers sortered by highest allocated amount based on they portfolio',
   })
   @ApiOkResponse({
     description: 'Response with success',
@@ -29,9 +29,24 @@ export class AdminController {
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @Get('topAllocationAmount')
   topAllocationAmount(@Query('page') page, @Query('pageSize') limit) {
-    return this.adminService.topAllocationAmount({
-      page,
-      limit,
-    });
+    return this.adminService.topAllocationAmount(page, limit);
+  }
+
+  @ApiOperation({
+    summary: 'Returns a list of customers sortered by highest withdraw amount',
+  })
+  @ApiOkResponse({
+    description: 'Response with success',
+    type: '', //TODO: create DTO
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @Get('topCashChurn')
+  topCashChurn(
+    @Query('page') page,
+    @Query('pageSize') limit,
+    @Query('start') startDate,
+    @Query('end') endDate,
+  ) {
+    return this.adminService.topCashChurn(page, limit, startDate, endDate);
   }
 }
