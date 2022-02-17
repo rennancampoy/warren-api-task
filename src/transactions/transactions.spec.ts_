@@ -1,0 +1,27 @@
+import { TransactionsService } from './transactions.service';
+import { TransactionsModule } from './transactions.module';
+import * as request from 'supertest';
+import { Test } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import { rootMongooseTestModule } from '../../test/MongooseTest';
+
+describe('Transactons', () => {
+  let app: INestApplication;
+  const transactionsService = { findAll: () => ['test'] };
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [rootMongooseTestModule(), TransactionsModule],
+    })
+      .overrideProvider(TransactionsService)
+      .useValue(transactionsService)
+      .compile();
+
+    app = moduleRef.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+});
