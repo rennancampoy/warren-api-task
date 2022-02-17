@@ -3,7 +3,7 @@ import {
   AccountTransferDto,
   PortfolioTransferDto,
 } from './dto/transactions.dto';
-import { Portfolio } from './../models/portfolio.model';
+import { Portfolio } from '../portfolios/portfolio.model';
 import { PortfoliosService } from './../portfolios/portfolios.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
@@ -16,7 +16,7 @@ import {
 import { CustomerId } from './../decorators/customer-id.decorator';
 import { TransactionsService } from './transactions.service';
 import { Types } from 'mongoose';
-import { CustomerDocument } from 'src/models/customer.model';
+import { CustomerDocument } from 'src/portfolios/customer.model';
 
 @ApiTags('Transactions')
 @Controller('transactions')

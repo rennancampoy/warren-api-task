@@ -1,10 +1,10 @@
-import { Portfolio } from '../portfolios/portfolio.model';
-import { CustomerDocument } from 'src/portfolios/customer.model';
 import { Model, Types, ObjectId } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { fixDate } from './../utils/date';
-import { TransactionDocument } from './transaction.model';
+import { TransactionDocument } from '../transactions/transaction.model';
+import { CustomerDocument } from 'src/portfolios/customer.model';
+import { Portfolio } from '../portfolios/portfolio.model';
 
 @Injectable()
 export class TransactionsService {
