@@ -7,17 +7,24 @@ import { CustomerDocument } from 'src/models/customer.model';
 export class PortfoliosService {
   constructor(
     @InjectModel('Customer')
-    private readonly customerModel: Model<CustomerDocument>,
+    readonly customerModel: Model<CustomerDocument>,
   ) {}
 
-  portfoliosFromCustomer = async (customerId: string) =>
-    (await this.customerModel.findById(customerId)).portfolios;
+  portfoliosFromCustomer = async (customerId: string) => {
+    const customer = await this.customerModel.findById(customerId);
+    if (!customer || (customer && !customer.portfolios)) return undefined;
+    return customer.portfolios;
+  };
 
-  getDetails = async (customerId: string, portfolioId: string) =>
-    (await this.portfoliosFromCustomer(customerId)).id(portfolioId);
+  getDetails = async (customerId: string, portfolioId: string) => {
+    const portfolios = await this.portfoliosFromCustomer(customerId);
+    if (!portfolios) return undefined;
+    return portfolios.id(portfolioId);
+  };
 
-  goalReached = async (customerId: string) =>
-    (await this.portfoliosFromCustomer(customerId)).filter(
-      (p) => p.amount >= p.goalAmount,
-    );
+  goalReached = async (customerId: string) => {
+    const portfolios = await this.portfoliosFromCustomer(customerId);
+    if (!portfolios) return undefined;
+    return portfolios.filter((p) => p.amount >= p.goalAmount);
+  };
 }

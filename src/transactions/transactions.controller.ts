@@ -1,3 +1,4 @@
+import { Portfolio } from './../models/portfolio.model';
 import { PortfoliosService } from './../portfolios/portfolios.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
@@ -6,8 +7,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { CustomerId } from 'src/decorators/customer-id.decorator';
+import { CustomerId } from './../decorators/customer-id.decorator';
 import { TransactionsService } from './transactions.service';
+import { Types } from 'mongoose';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -90,10 +92,14 @@ export class TransactionsController {
     @Query('toPortfolio') toPortfolio,
     @Body('amount') amount,
   ) {
-    const fromPortfolioDetails = await this.portfolioService.getDetails(
+    const fromPortfolioDetails:
+      | (Types.Subdocument<Types.ObjectId> & Portfolio)
+      | undefined = await this.portfolioService.getDetails(
       customerId,
       fromPortfolio,
     );
+
+    if (!fromPortfolioDetails) return { error: 'invalid customer id' };
 
     if (fromPortfolioDetails.amount - amount < 0)
       return { error: 'Insufficient portfolio balance' };
